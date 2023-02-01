@@ -10,17 +10,33 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
 
-io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
+app.get("/", (req, res) => {
+  res.send("Server is running");
+});
 
-  socket.on("send_message", (data) => {
-    socket.broadcast.emit("receive_message", data);
+io.on("connection", (socket) => {
+  socket.emit("me", socket.id);
+  // console.log(`${socket.id}`);
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("callEnded");
   });
+
+  socket.on("callUser", ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit("callUser", { signal: signalData, from, name });
+  });
+
+  socket.on("answerCall", (data) => {
+    io.to(data.to).emit("callAccepted", data.signal);
+  });
+
+  // socket.on("send_message", (data) => {
+  //   socket.broadcast.emit("receive_message", data);
+  //  });
 });
 
 server.listen(3001, () => {
