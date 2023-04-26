@@ -19,10 +19,13 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket) => 
+{
   socket.emit("me", socket.id);
   // console.log(`${socket.id}`);
-  socket.on("disconnect", () => {
+  socket.on("disconnect", (data) => 
+  {
+    io.to(data.to).emit("callAccepted", data.signal);
     socket.broadcast.emit("callEnded");
   });
 
