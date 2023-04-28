@@ -16,7 +16,7 @@ const io = new Server(server, {
 });
 
 app.get("/", (req, res) => {
-  res.send("Welcome to letsmeet api");
+  res.send("Welcome to letsmeet api . Click on the link for documentation");
 });
 
 io.on("connection", (socket) => 
